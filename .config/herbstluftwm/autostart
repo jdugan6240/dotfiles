@@ -8,16 +8,7 @@ hc() {
 
 hc emit_hook reload
 
-#xsetroot -solid '#5A8E3A'
 feh --bg-scale ~/wallpapers/ohaver.png
-
-herbstclient silent new_attr bool my_not_first_autostart
-
-if hc silent new_attr bool my_not_first_autostart ; then
-    nm-applet &
-    volumeicon &
-    polybar example &
-fi
 
 # remove all existing keybindings
 hc keyunbind --all
@@ -32,6 +23,13 @@ hc keybind $Mod-Shift-r reload
 hc keybind $Mod-Shift-c close
 hc keybind $Mod-Return spawn "${TERMINAL:-alacritty}" # use your $TERMINAL with xterm as fallback
 hc keybind $Mod-d spawn "dmenu_run"
+hc keybind $Mod-Shift-s spawn scrot -e 'mkdir -p ~/screenshots; mv $f ~/screenshots/'
+
+hc keybind XF86MonBrightnessUp spawn light -A 5
+hc keybind XF86MonBrightnessDown spawn light -U 5
+hc keybind XF86AudioRaiseVolume spawn pactl set-sink-volume 0 +5%
+hc keybind XF86AudioLowerVolume spawn pactl set-sink-volume 0 -5%
+hc keybind XF86AudioMute spawn pactl set-sink-mute 0 toggle
 
 # basic movement in tiling and floating mode
 # focusing clients
@@ -73,7 +71,7 @@ hc keybind $Mod-Control-Up      resize up +$resizestep
 hc keybind $Mod-Control-Right   resize right +$resizestep
 
 # tags
-tag_names=( "DEV" "WWW" "SYS" "DOC" "GPX" "MSC" )
+tag_names=( "DEV" "WWW" "SYS" "DOC" "GFX" "MSC" )
 tag_keys=( {1..6} 0 )
 
 hc rename default "${tag_names[0]}" || true
@@ -165,10 +163,8 @@ hc set tree_style '╾│ ├└╼─┐'
 # unlock, just to be sure
 hc unlock
 
-# do multi monitor setup here, e.g.:
-# hc set_monitors 1280x1024+0+0 1280x1024+1280+0
-# or simply:
-# hc detect_monitors
+# do multi monitor setup here
+hc detect_monitors
 
 # find the panel
 panel=~/.config/herbstluftwm/panel.sh
@@ -177,13 +173,4 @@ for monitor in $(hc list_monitors | cut -d: -f1) ; do
     # start it on each monitor
     "$panel" "$monitor" &
 done
-
-
-herbstclient silent new_attr bool my_not_first_autostart
-
-if hc silent new_attr bool my_not_first_autostart ; then
-    nm-applet &
-    volumeicon &
-    polybar example &
-fiherbstclient silent new_attr bool my_not_first_autostart
 

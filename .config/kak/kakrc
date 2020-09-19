@@ -1,36 +1,45 @@
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
+source ~/projects/kak-gradle/rc/kak-gradle.kak
+source ~/projects/kak-gradle/rc/groovy-gradle.kak
+source ~/projects/kak-inspector/rc/kak-inspector.kak
+
 hook global WinCreate ^[^*]+$ %{ add-highlighter window/ number-lines -hlcursor }
+
+# Gotta have the cat because cats are cool
+set-option global ui_options ncurses_assistant=cat
 
 set global tabstop 4
 
-colorscheme tomorrow-night
-
-plug "lePerdu/kakboard" %{
-    hook global WinCreate .* %{ kakboard-enable }
+plug "robertmeta/plug.kak" noload
+plug "ul/kak-lsp"
+plug "andreyorst/smarttab.kak"
+plug "jdugan6240/powerline.kak" defer powerline %{
+    set-option global powerline_format 'lsp git bufname filetype mode_info line_column position'
 }
 
-plug "ul/kak-lsp" do %{
-    cargo build --release --locked
-    cargo install --force --path .
-} config %{
-    set global lsp_diagnostic_line_error_sign 'X'
-    set global lsp_diagnostic_line_warning_sign '⚠'
-
-    define-command lsp-restart -docstring 'restart lsp server' %{ lsp-stop; lsp-start }
-    hook global WinSetOption filetype=(c|cpp|cc|java|python|scala) %{
-        set-option window lsp_auto_highlight_references true
-        set-option window lsp_hover_anchor false
-        lsp-auto-hover-enable
-        echo -debug "Enabling LSP for filtetype %opt{filetype}"
-        lsp-enable-window
+plug "KJ_Duncan/kakoune-kotlin.kak" domain "bitbucket.org" config %{
+	# OPTIONAL CONFIGURATION
+	hook global -once WinSetOption filetype=kotlin %{
+    	define-command kotlin-section-line -docstring "seperate a section of code with (// --)" %{
+        	try %{ execute-keys -draft "<esc>o//<space>-<esc>hy98p<esc>jo<esc>" }
+    	}
     }
+    hook global WinSetOption filetype=kotlin %{
 
-    hook global KakEnd .* lsp-exit
+        alias window ksl kotlin-section-line
+
+        hook global -once -always WinSetOption filetype=.* %{
+            unalias window ksl kotlin-section-line
+        }
+    }
 }
 
-plug "andreyorst/powerline.kak" defer powerline %{
-    powerline-theme tomorrow-night
-} config %{
-    powerline-start
+hook global WinSetOption filetype=(java|python|c|cpp) %{
+	lsp-enable-window
+	lsp-auto-hover-enable
+	expandtab
 }
+
+powerline-start
+

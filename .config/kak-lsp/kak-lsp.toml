@@ -65,9 +65,15 @@ args = ["--init={\"completion\":{\"detailedLabel\":false}}"]
 [language.kotlin]
 filetypes = ["kotlin", "kt"]
 roots = ["build.gradle"]
-command = "kotlin-language-server"
+command = "/home/jdugan/lsp/kotlin-language-server/server/build/install/server/bin/kotlin-language-server"
 
 [language.scala]
 filetypes = ["scala"]
 roots = ["build.sbt"]
 command = "metals-kakoune"
+
+[language.rust]
+filetypes = ["rust"]
+roots = ["Cargo.toml"]
+command = "sh"
+args = ["-c", "if command -v rustup >/dev/null; then $(rustup which rls); else rls; fi"]
